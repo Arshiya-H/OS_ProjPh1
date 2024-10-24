@@ -105,3 +105,17 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 };
+
+char* strcpy(char*, const char*);
+
+typedef struct proc_info {
+    char name[16];
+    int pid;
+    int ppid;
+    enum procstate state;
+} proc_info;
+
+typedef struct child_processes {
+    int count;
+    proc_info processes[NPROC];
+} child_processes;

@@ -94,7 +94,14 @@ sys_uptime(void)
 
 uint64 sys_get_child_processes(void)
 {
-    int res = get_child_processes();
-    printf("hi from sysproc.c file and this is result: %d\n", res);
-    return res;
+    printf("system call \"sys_get_child_processes\" invoked\n");
+    child_processes *info;
+    child_processes kinfo;
+    argaddr(0, (uint64 *)&info);
+    struct proc *p = myproc();
+    copyin(p->pagetable, (char *) info, (uint64) &kinfo, sizeof(kinfo));
+    get_child_processes(&kinfo);
+    //printf("hi from sysproc.c file and this is result: %d\n", kinfo.count); // 4 debug
+    copyout(p->pagetable, (uint64) info, (char *) &kinfo, sizeof(kinfo));
+    return 0;
 }

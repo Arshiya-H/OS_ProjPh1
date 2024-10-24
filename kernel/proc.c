@@ -694,7 +694,15 @@ procdump(void)
   }
 }
 
-int get_child_processes(void){
-    printf("hi from proc.c file\n");
-    return 22;
+void get_child_processes(child_processes * procs_list){
+    //printf("hi from proc.c file\n"); // 4 debug
+    struct proc* p;
+    procs_list->count = 0;
+    for (p = (proc + 2); (p < &proc[NPROC]) && (p->state != UNUSED); ++p) {
+        proc_info *info = &procs_list->processes[procs_list->count++];
+        strncpy(info->name ,p->name, sizeof(p->name));
+        info->pid = p->pid;
+        info->ppid = p->parent->pid;
+        info->state = p->state;
+    }
 }
