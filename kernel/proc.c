@@ -693,3 +693,8 @@ procdump(void)
     printf("\n");
   }
 }
+
+int get_child_processes(void){
+    printf("hi from proc.c file\n");
+    return 22;
+}

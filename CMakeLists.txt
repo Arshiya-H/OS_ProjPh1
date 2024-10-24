@@ -66,4 +66,4 @@ add_executable(xv6_riscv
         user/user.h
         user/usertests.c
         user/wc.c
-        user/zombie.c)
+        user/zombie.c user/testChildProcs.c)

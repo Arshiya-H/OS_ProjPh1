@@ -91,3 +91,10 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64 sys_get_child_processes(void)
+{
+    int res = get_child_processes();
+    printf("hi from sysproc.c file and this is result: %d\n", res);
+    return res;
+}
