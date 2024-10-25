@@ -706,3 +706,26 @@ void get_child_processes(child_processes * procs_list){
         info->state = p->state;
     }
 }
+
+int find_origin_father(int of_pid, int t_pid){
+    struct proc* p;
+    struct proc* of_address = 0;
+    struct proc* t_address = 0;
+    for (p = proc ; (p < &proc[NPROC]) && (p->state != UNUSED); ++p) {
+        if (p->pid == of_pid) {
+            of_address = p;
+        }
+        if (p->pid == t_pid) {
+            t_address = p;
+        }
+    }
+    while (t_address > of_address){
+        if (t_address->parent->pid == of_pid) {
+            return 1;
+        } else {
+            t_address = t_address->parent;
+        }
+    }
+    return 0;
+
+}

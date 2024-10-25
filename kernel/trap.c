@@ -16,10 +16,18 @@ void kernelvec();
 
 extern int devintr();
 
+struct {
+    struct report reports[MAX_REPORT_BUFFER_SIZE];  // Array of reports
+    int number_of_reports;
+    int write_index;
+} internal_reports_list;
+
 void
 trapinit(void)
 {
   initlock(&tickslock, "time");
+  internal_reports_list.number_of_reports = 0;
+  internal_reports_list.write_index = 0;
 }
 
 // set up to take exceptions and traps while in the kernel.
@@ -68,6 +76,19 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {
+      struct report *rep = &internal_reports_list.reports[internal_reports_list.write_index % MAX_REPORT_BUFFER_SIZE];
+      strncpy(rep->pname, p->name, sizeof(rep->pname));  // Process name
+      rep->pid = p->pid;                                 // Process ID
+      rep->ppid = p->parent->pid;
+      rep->scause = r_scause();                          // Trap cause
+      rep->sepc = p->trapframe->epc;                     // Exception PC
+      rep->stval = r_stval();                            // Trap value
+      //printf("%d\t\t%s\t\t%lu\t\t%lu\t\t%lu\n",rep->pid,rep->pname,rep->scause,rep->sepc,rep->stval);
+
+      if (internal_reports_list.number_of_reports < 10) {
+          internal_reports_list.number_of_reports++;
+      }
+      internal_reports_list.write_index++;
     printf("usertrap(): unexpected scause 0x%lx pid=%d\n", r_scause(), p->pid);
     printf("            sepc=0x%lx stval=0x%lx\n", r_sepc(), r_stval());
     setkilled(p);
@@ -217,7 +238,27 @@ devintr()
 }
 
 int traps_report(struct traps_report * traps){
-    printf("this is trap.c\n");
+    //printf("this is trap.c\n");
+    traps->count = 0;
+    struct proc* p = myproc();
+    int j = 0;
+    for ( int i = 0; i < internal_reports_list.number_of_reports; ++i) {
+        struct report r =internal_reports_list.reports[i];
+        int filter_cond = find_origin_father(p->pid,r.pid); // if it finds current proc father return 1
+        //printf("find_origin_father(of_pid: %d,t_pid: %d): %d\n",a,p->pid,r.pid);
+        if (filter_cond) {
+            struct report* tr = &traps->reports[j];
+            tr->pid = r.pid;
+            tr->ppid = r.ppid;
+            tr->scause = r.scause;
+            tr->sepc = r.sepc;
+            tr->stval = r.stval;
+            strncpy(tr->pname,r.pname, sizeof(r.pname));
+            ++j;
+            ++traps->count;
+        }
+    }
+
     return 0;
 }
 

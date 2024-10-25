@@ -108,13 +108,13 @@ uint64 sys_get_child_processes(void)
 
 uint64 sys_traps_report(void)
 {
-    printf("hello from sys_traps_report\n");
+    printf("system call \"sys_traps_report\" invoked\n");
     struct traps_report  *info;
     struct traps_report kinfo;
     argaddr(0, (uint64 *)&info);
     struct proc *p = myproc();
     copyin(p->pagetable, (char *) info, (uint64) &kinfo, sizeof(kinfo));
     traps_report(&kinfo);
-
+    copyout(p->pagetable, (uint64) info, (char *) &kinfo, sizeof(kinfo));
     return 0;
 }
