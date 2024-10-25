@@ -2,6 +2,7 @@
 
 struct stat;
 struct child_processes;
+struct traps_report;
 
 // system calls
 int fork(void);
@@ -26,6 +27,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int get_child_processes(struct child_processes *);
+int traps_report(struct traps_report *);
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -119,3 +119,18 @@ typedef struct child_processes {
     int count;
     proc_info processes[NPROC];
 } child_processes;
+
+#define MAX_REPORT_BUFFER_SIZE 10
+
+struct report {
+    char pname[16];  // Process name
+    int pid;         // Process ID
+    uint64 scause;   // Supervisor Trap Cause
+    uint64 sepc;     // Supervisor Exception Program Counter
+    uint64 stval;    // Supervisor Trap Value
+};
+
+struct traps_report {
+    struct report reports[MAX_REPORT_BUFFER_SIZE];  // Array of reports
+    int count;                                      // Number of reports
+};
